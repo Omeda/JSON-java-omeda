@@ -229,10 +229,11 @@ public class JSONObject {
 
             if (key != null) {
                 // Check if key exists
-                if (this.opt(key) != null) {
-                    // key already exists
-                    throw x.syntaxError("Duplicate key \"" + key + "\"");
-                }
+                // Omeda change: we allow duplicate keys - most recent key place will replace previous.
+//                if (this.opt(key) != null) {
+//                    // key already exists
+//                    throw x.syntaxError("Duplicate key \"" + key + "\"");
+//                }
                 // Only add value if non-null
                 Object value = x.nextValue();
                 if (value!=null) {
