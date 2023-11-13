@@ -853,15 +853,7 @@ public class JSONObject {
      *             if there is no string value for the key.
      */
     public String getString(String key) throws JSONException {
-        Object object = this.get(key);
-        if (object instanceof String) {
-            return (String) object;
-        }
         return get(key).toString();
-        // for our purposes we don't want to validate if something was originally a string
-        // we just want the string representation the same way this worked in earlier
-        // versions of the library.
-        //throw wrongValueFormatException(key, "string", object, null);
     }
 
     /**
