@@ -6,6 +6,10 @@
 JSON in Java [package org.json]
 ===============================
 
+# 11/13/2023: Omeda's org.json version
+As part of https://omeda.atlassian.net/browse/ARCH-6973 we needed to upgrade our org.json library to a more recent version while also limiting the potential negative impact on our applications. Since Omeda adopted the original library, there have been several changes to validate Strings as well as duplicate keys inside json objects and arrays. Our application in various places uses .getString("key") very loosely. It does not require that an actual string was placed in the object, we just want back a String representation of the data. For example, one part of our code may do object.put("transactionId", 12345) and then later do String transactionId = object.getString("transactionId"). With the older versions of org.json this is fine, with newer ones it throws an exception. We want it to work as it always has. The second piece is duplicate keys. For our purposes we don't care if a duplicate key is set on an object - we just want whatever was last set for a key to be the assigned value. So if I do object.set("key1", "val1") then I do object.set("key1","val2"). object.get("key1") should equal "val2". For us it is particuarly important because we have a large number of client processes using our webservices that rely on this library. More stringent validation on Strings and duplicate keys could break those API calls.
+
+
 [![Maven Central](https://img.shields.io/maven-central/v/org.json/json.svg)](https://mvnrepository.com/artifact/org.json/json)
 
 **[Click here if you just want the latest release jar file.](https://search.maven.org/remotecontent?filepath=org/json/json/20231013/json-20231013.jar)**
