@@ -857,7 +857,11 @@ public class JSONObject {
         if (object instanceof String) {
             return (String) object;
         }
-        throw wrongValueFormatException(key, "string", object, null);
+        return get(key).toString();
+        // for our purposes we don't want to validate if something was originally a string
+        // we just want the string representation the same way this worked in earlier
+        // versions of the library.
+        //throw wrongValueFormatException(key, "string", object, null);
     }
 
     /**
