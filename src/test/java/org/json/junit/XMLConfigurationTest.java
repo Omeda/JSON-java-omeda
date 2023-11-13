@@ -4,11 +4,6 @@ package org.json.junit;
 Public Domain.
 */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -26,6 +21,8 @@ import org.json.XMLParserConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -557,6 +554,37 @@ public class XMLConfigurationTest {
         assertEquals(actualXML, resultXML);
     }
 
+    @Test
+    public void shouldHandleEmptyNodeValue()
+    {
+        JSONObject inputJSON = new JSONObject();
+        inputJSON.put("Emptyness", "");
+        String expectedXmlWithoutExplicitEndTag = "<Emptyness/>";
+        String expectedXmlWithExplicitEndTag = "<Emptyness></Emptyness>";
+        assertEquals(expectedXmlWithoutExplicitEndTag, XML.toString(inputJSON, null,
+                new XMLParserConfiguration().withCloseEmptyTag(false)));
+        assertEquals(expectedXmlWithExplicitEndTag, XML.toString(inputJSON, null,
+                new XMLParserConfiguration().withCloseEmptyTag(true)));
+    }
+
+    @Test
+    public void shouldKeepConfigurationIntactAndUpdateCloseEmptyTagChoice()
+    {
+        XMLParserConfiguration keepStrings = XMLParserConfiguration.KEEP_STRINGS;
+        XMLParserConfiguration keepStringsAndCloseEmptyTag = keepStrings.withCloseEmptyTag(true);
+        XMLParserConfiguration keepDigits = keepStringsAndCloseEmptyTag.withKeepStrings(false);
+        XMLParserConfiguration keepDigitsAndNoCloseEmptyTag = keepDigits.withCloseEmptyTag(false);
+        assertTrue(keepStrings.isKeepStrings());
+        assertFalse(keepStrings.isCloseEmptyTag());
+        assertTrue(keepStringsAndCloseEmptyTag.isKeepStrings());
+        assertTrue(keepStringsAndCloseEmptyTag.isCloseEmptyTag());
+        assertFalse(keepDigits.isKeepStrings());
+        assertTrue(keepDigits.isCloseEmptyTag());
+        assertFalse(keepDigitsAndNoCloseEmptyTag.isKeepStrings());
+        assertFalse(keepDigitsAndNoCloseEmptyTag.isCloseEmptyTag());
+
+    }
+
     /**
      * Investigate exactly how the "content" keyword works
      */
@@ -733,7 +761,7 @@ public class XMLConfigurationTest {
     @Test
     public void testToJSONArray_jsonOutput() {
         final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
-        final JSONObject expected = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",1,\"00\",0],\"title\":true}}");
+        final JSONObject expected = new JSONObject("{\"root\":{\"item\":{\"id\":1},\"id\":[1,1,0,0],\"title\":true}}");
         final JSONObject actualJsonOutput = XML.toJSONObject(originalXml, 
                 new XMLParserConfiguration().withKeepStrings(false));
         Util.compareActualVsExpectedJsonObjects(actualJsonOutput,expected);

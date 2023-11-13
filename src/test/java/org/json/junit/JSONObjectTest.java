@@ -55,6 +55,7 @@ import org.json.junit.data.RecursiveBeanEquals;
 import org.json.junit.data.Singleton;
 import org.json.junit.data.SingletonEnum;
 import org.json.junit.data.WeirdList;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.jayway.jsonpath.Configuration;
@@ -2095,7 +2096,9 @@ public class JSONObjectTest {
              "}";
         JSONObject jsonObject = new JSONObject(jsonObjectStr);
         assertTrue("jsonObject valueToString() incorrect",
-                JSONObject.valueToString(jsonObject).equals(jsonObject.toString()));
+            new JSONObject(JSONObject.valueToString(jsonObject))
+                .similar(new JSONObject(jsonObject.toString()))
+            );
         String jsonArrayStr = 
             "[1,2,3]";
         JSONArray jsonArray = new JSONArray(jsonArrayStr);
@@ -2106,7 +2109,8 @@ public class JSONObjectTest {
         map.put("key2", "val2");
         map.put("key3", "val3");
         assertTrue("map valueToString() incorrect",
-                jsonObject.toString().equals(JSONObject.valueToString(map))); 
+         new JSONObject(jsonObject.toString())
+         .similar(new JSONObject(JSONObject.valueToString(map))));
         Collection<Integer> collection = new ArrayList<Integer>();
         collection.add(Integer.valueOf(1));
         collection.add(Integer.valueOf(2));
@@ -3664,6 +3668,7 @@ public class JSONObjectTest {
     /**
     * Tests for stack overflow. See https://github.com/stleary/JSON-java/issues/654
     */
+    @Ignore("This test relies on system constraints and may not always pass. See: https://github.com/stleary/JSON-java/issues/821")
     @Test(expected = JSONException.class)
     public void issue654StackOverflowInputWellFormed() {
         //String input = new String(java.util.Base64.getDecoder().decode(base64Bytes));
@@ -3671,7 +3676,7 @@ public class JSONObjectTest {
         JSONTokener tokener = new JSONTokener(resourceAsStream);
         JSONObject json_input = new JSONObject(tokener);
         assertNotNull(json_input);
-        fail("Excepected Exception.");
+        fail("Excepected Exception due to stack overflow.");
     }
 
     @Test

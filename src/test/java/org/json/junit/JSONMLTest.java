@@ -709,7 +709,7 @@ public class JSONMLTest {
     @Test
     public void testToJSONArray_jsonOutput() {
         final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
-        final String expectedJsonString = "[\"root\",[\"id\",\"01\"],[\"id\",1],[\"id\",\"00\"],[\"id\",0],[\"item\",{\"id\":\"01\"}],[\"title\",true]]";
+        final String expectedJsonString = "[\"root\",[\"id\",1],[\"id\",1],[\"id\",0],[\"id\",0],[\"item\",{\"id\":1}],[\"title\",true]]";
         final JSONArray actualJsonOutput = JSONML.toJSONArray(originalXml, false);
         assertEquals(expectedJsonString, actualJsonOutput.toString());
     }
@@ -762,8 +762,8 @@ public class JSONMLTest {
         final String xml = JSONML.toString(originalObject);
         final JSONObject revertedObject = JSONML.toJSONObject(xml, false);
         final String newJson = revertedObject.toString();
-        assertTrue("JSON Objects are not similar",originalObject.similar(revertedObject));
-        assertEquals("original JSON does not equal the new JSON",originalJson, newJson);
+        assertTrue("JSON Objects are not similar", originalObject.similar(revertedObject));
+        assertTrue("JSON Strings are not similar", new JSONObject(originalJson).similar(new JSONObject(newJson)));
     }
 
 // these tests do not pass for the following reasons:

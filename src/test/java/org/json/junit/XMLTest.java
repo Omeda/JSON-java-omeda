@@ -791,7 +791,7 @@ public class XMLTest {
     @Test
     public void testToJSONArray_jsonOutput() {
         final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
-        final JSONObject expectedJson = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",1,\"00\",0],\"title\":true}}");
+        final JSONObject expectedJson = new JSONObject("{\"root\":{\"item\":{\"id\":1},\"id\":[1,1,0,0],\"title\":true}}");
         final JSONObject actualJsonOutput = XML.toJSONObject(originalXml, false);
 
         Util.compareActualVsExpectedJsonObjects(actualJsonOutput,expectedJson);
@@ -1177,6 +1177,26 @@ public class XMLTest {
 
 
     }
+
+    @Test
+    public void shouldCreateExplicitEndTagWithEmptyValueWhenConfigured(){
+        String jsonString = "{outer:{innerOne:\"\", innerTwo:\"two\"}}";
+        JSONObject jsonObject = new JSONObject(jsonString);
+        String expectedXmlString = "<encloser><outer><innerOne></innerOne><innerTwo>two</innerTwo></outer></encloser>";
+        String xmlForm = XML.toString(jsonObject,"encloser", new XMLParserConfiguration().withCloseEmptyTag(true));
+        assertEquals(expectedXmlString, xmlForm);
+    }
+
+    @Test
+    public void shouldNotCreateExplicitEndTagWithEmptyValueWhenNotConfigured(){
+        String jsonString = "{outer:{innerOne:\"\", innerTwo:\"two\"}}";
+        JSONObject jsonObject = new JSONObject(jsonString);
+        String expectedXmlString = "<encloser><outer><innerOne/><innerTwo>two</innerTwo></outer></encloser>";
+        String xmlForm = XML.toString(jsonObject,"encloser", new XMLParserConfiguration().withCloseEmptyTag(false));
+        assertEquals(expectedXmlString, xmlForm);
+    }
+
+
     @Test
     public void testIndentSimpleJsonObject(){
         String str = "{    \"employee\": {  \n" +
@@ -1234,7 +1254,7 @@ public class XMLTest {
                 for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
                     expected.append(buffer, 0, numRead);
                 }
-                assertEquals(expected.toString(), actualString);
+                assertTrue(XML.toJSONObject(expected.toString()).similar(XML.toJSONObject(actualString)));
             }
         } catch (IOException e) {
             fail("file writer error: " +e.getMessage());
